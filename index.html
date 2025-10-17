@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Added Babel Standalone for in-browser TypeScript compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     @import url('https://rsms.me/inter/inter.css');
     body { font-family: 'Inter', sans-serif; }
@@ -32,6 +34,7 @@
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
   <app-root></app-root>
   <script async src="https://ga.jspm.io/npm:es-module-shims@1.10.0/dist/es-module-shims.js"></script>
-  <script type="module" src="./index.js"></script>
+  <!-- Changed script type to use Babel for transpilation of the TSX entry file -->
+  <script type="text/babel" data-presets="typescript" data-type="module" src="./index.tsx"></script>
 </body>
 </html>
