@@ -30,11 +30,12 @@
   }
 }
 </script>
+  <!-- es-module-shims must be loaded synchronously after the importmap -->
+  <script src="https://ga.jspm.io/npm:es-module-shims@1.10.0/dist/es-module-shims.js"></script>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
   <app-root></app-root>
-  <script async src="https://ga.jspm.io/npm:es-module-shims@1.10.0/dist/es-module-shims.js"></script>
-  <!-- Changed script type to use Babel for transpilation of the TSX entry file -->
-  <script type="text/babel" data-presets="typescript" data-type="module" src="./index.tsx"></script>
+  <!-- The main application script is deferred to execute after the document is parsed -->
+  <script type="text/babel" data-presets="typescript" data-type="module" src="./index.tsx" defer></script>
 </body>
 </html>
