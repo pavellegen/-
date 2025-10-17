@@ -1,0 +1,48 @@
+<div class="app-container">
+  @switch (currentView()) {
+    @case ('home') {
+      <app-home 
+        [loggedInLawyer]="loggedInLawyer()"
+        (categorySelected)="showListForCategory($event)"
+        (registrationStarted)="startRegistration($event)"
+        (loginRequest)="logInLawyer($event)"
+        (goToProfile)="goToMyProfile()"
+        (continueRegistration)="continueEditingProfile()">
+      </app-home>
+    }
+    @case ('list') {
+      @if (selectedCategory(); as category) {
+        <app-lawyer-list 
+          [category]="category" 
+          (lawyerSelected)="showProfile($event)" 
+          (back)="goHome('#problem-selection')">
+        </app-lawyer-list>
+      }
+    }
+    @case ('profile') {
+      @if (selectedLawyer(); as lawyer) {
+        <app-lawyer-profile 
+          [lawyerId]="lawyer.id"
+          [isOwner]="isViewingOwnProfile()"
+          (back)="goBackToList()"
+          (edit)="editProfile()">
+        </app-lawyer-profile>
+      }
+    }
+    @case ('profileEditor') {
+      <app-lawyer-profile-editor 
+        [lawyer]="selectedLawyer()"
+        [cameFrom]="editCameFrom()"
+        (save)="saveProfile($event)" 
+        (back)="handleEditorBack()">
+      </app-lawyer-profile-editor>
+    }
+    @case ('admin') {
+      <app-admin-panel
+        (home)="goHome()"
+        (editLawyer)="editFromAdmin($event)"
+        (deleteLawyer)="deleteLawyerFromAdmin($event)">
+      </app-admin-panel>
+    }
+  }
+</div>

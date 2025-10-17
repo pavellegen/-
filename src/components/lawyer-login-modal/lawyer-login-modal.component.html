@@ -1,0 +1,73 @@
+<div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 animate-fade-in" (click)="onClose()">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md mx-auto animate-slide-up" (click)="$event.stopPropagation()">
+    
+    @switch (formStep()) {
+      @case ('enterPhone') {
+        <form (submit)="$event.preventDefault(); getVerificationCode()">
+           <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+            <h2 class="text-2xl font-bold dark:text-white">Вход для юристов</h2>
+            <p class="text-slate-500 dark:text-slate-400 mt-1">Введите номер телефона для входа или регистрации.</p>
+          </div>
+          <div class="p-6 space-y-4">
+            <div>
+              <label for="phone-number" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Номер телефона</label>
+              <input 
+                type="tel" 
+                id="phone-number" 
+                required 
+                placeholder="+7 (999) 123-45-67"
+                [value]="phoneNumber()"
+                (input)="onPhoneInput($event)"
+                class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm text-slate-900 dark:text-white">
+            </div>
+             @if(error(); as err) {
+              <p class="text-sm text-red-600">{{ err }}</p>
+            }
+          </div>
+          <div class="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-b-2xl flex justify-end items-center gap-3">
+            <button type="button" (click)="onClose()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 dark:bg-slate-600 dark:text-white dark:border-slate-500 dark:hover:bg-slate-500 transition">Отмена</button>
+            <button type="submit" class="px-6 py-2 text-sm font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600 transition">Получить код</button>
+          </div>
+        </form>
+      }
+      @case ('enterCode') {
+        <form (submit)="$event.preventDefault(); onLogin()">
+          <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+            <h2 class="text-2xl font-bold dark:text-white">Подтверждение</h2>
+            <p class="text-slate-500 dark:text-slate-400 mt-1">Мы (как будто) отправили код на номер <span class="font-semibold text-slate-700 dark:text-slate-200">{{ phoneNumber() }}</span>. <button type="button" (click)="changePhoneNumber()" class="text-amber-600 hover:underline text-sm">Изменить</button></p>
+          </div>
+          <div class="p-6 space-y-4">
+            <div>
+              <label for="code" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Код из СМС</label>
+              <input 
+                type="text" 
+                id="code" 
+                required 
+                maxlength="4" 
+                inputmode="numeric"
+                pattern="\d{4}"
+                placeholder="0000"
+                [value]="verificationCode()"
+                (input)="verificationCode.set($event.target.value)"
+                class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm text-slate-900 dark:text-white text-center tracking-[1em]">
+               <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 text-center">Для теста подойдет любой 4-значный код.</p>
+            </div>
+            @if(error(); as err) {
+              <p class="text-sm text-red-600">{{ err }}</p>
+            }
+          </div>
+          <div class="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-b-2xl flex justify-end items-center gap-3">
+            <button type="button" (click)="onClose()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 dark:bg-slate-600 dark:text-white dark:border-slate-500 dark:hover:bg-slate-500 transition">Отмена</button>
+            <button type="submit" class="px-6 py-2 text-sm font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600 transition">Войти</button>
+          </div>
+        </form>
+      }
+    }
+  </div>
+</div>
+<style>
+  .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+  .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>

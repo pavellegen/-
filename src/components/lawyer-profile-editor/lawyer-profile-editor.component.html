@@ -1,0 +1,214 @@
+<div class="bg-slate-50 dark:bg-slate-950 min-h-screen">
+  <div class="container mx-auto px-4 py-12">
+    <div class="max-w-3xl mx-auto">
+      <div class="mb-6">
+         <button (click)="back.emit()" class="flex items-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+          </svg>
+           @if(cameFrom() === 'admin') {
+             В админ-панель
+           } @else if (lawyer() && lawyer()!.fullName) {
+             К профилю
+           } @else {
+             На главную
+           }
+        </button>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 sm:p-8">
+        <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-2">{{ (lawyer() && lawyer()!.fullName) ? 'Редактирование профиля' : 'Регистрация нового юриста' }}</h1>
+        <p class="text-slate-500 dark:text-slate-400 mb-8">{{ (lawyer() && lawyer()!.fullName) ? 'Обновите информацию в вашем профиле.' : 'Заполните профиль, чтобы начать получать клиентов.'}}</p>
+
+        <!-- Progress Bar -->
+        <div class="mb-8">
+          <div class="flex justify-between mb-1 text-xs sm:text-sm">
+            <span class="font-medium text-center" [class.text-amber-600]="currentStep() >= 1" [class.text-slate-500]="currentStep() < 1" [class.dark:text-slate-400]="currentStep() < 1">Личная информация</span>
+            <span class="font-medium text-center" [class.text-amber-600]="currentStep() >= 2" [class.text-slate-500]="currentStep() < 2" [class.dark:text-slate-400]="currentStep() < 2">Проф. опыт</span>
+            <span class="font-medium text-center" [class.text-amber-600]="currentStep() >= 3" [class.text-slate-500]="currentStep() < 3" [class.dark:text-slate-400]="currentStep() < 3">О себе</span>
+             <span class="font-medium text-center" [class.text-amber-600]="currentStep() >= 4" [class.text-slate-500]="currentStep() < 4" [class.dark:text-slate-400]="currentStep() < 4">Стоимость услуг</span>
+          </div>
+          <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+            <div class="bg-amber-500 h-2 rounded-full transition-all duration-500" [style.width]="(currentStep() - 1) * 33.33 + '%'"></div>
+          </div>
+        </div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+          <!-- Step 1: Personal Info -->
+          @if (currentStep() === 1) {
+            <div class="space-y-6 animate-fade-in">
+              <h2 class="text-xl font-semibold text-slate-700 dark:text-slate-200 border-b dark:border-slate-700 pb-2">Шаг 1: Личная информация</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                <div>
+                  <label for="fullName" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Фамилия и имя</label>
+                  <input id="fullName" type="text" formControlName="fullName" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 dark:border-slate-600">
+                   @if (profileForm.controls.fullName.invalid && (profileForm.controls.fullName.dirty || profileForm.controls.fullName.touched)) {
+                    <div class="mt-1">
+                      @if (profileForm.controls.fullName.hasError('required')) {
+                          <p class="text-sm text-red-600">Это поле обязательно для заполнения.</p>
+                      }
+                      @if (profileForm.controls.fullName.hasError('pattern')) {
+                          <p class="text-sm text-red-600">Пожалуйста, введите фамилию и имя.</p>
+                      }
+                    </div>
+                  }
+                </div>
+                <div>
+                  <label for="city" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Город</label>
+                  <input id="city" type="text" formControlName="city" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 dark:border-slate-600">
+                   @if (profileForm.controls.city.invalid && (profileForm.controls.city.dirty || profileForm.controls.city.touched)) {
+                    <p class="text-sm text-red-600 mt-1">Пожалуйста, укажите город.</p>
+                  }
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Фотография</label>
+                  <div class="mt-2 flex items-center gap-4">
+                    <img [src]="photoPreview() || 'https://picsum.photos/seed/placeholder/200'" alt="Предпросмотр фото" class="w-24 h-24 rounded-full object-cover shadow-sm bg-slate-200">
+                    <div class="flex-grow">
+                      @if(photoPreview() && profileForm.controls.photoUrl.value) {
+                        <span class="text-sm text-emerald-600 font-semibold block">Фото загружено</span>
+                      } @else {
+                        <span class="text-sm text-slate-500 dark:text-slate-400 block">Загрузите ваше фото</span>
+                      }
+                      <label for="photoUrl" class="mt-2 cursor-pointer inline-block text-sm font-semibold text-amber-700 bg-amber-100 hover:bg-amber-200 px-4 py-2 rounded-full transition-colors">
+                        Выбрать файл
+                      </label>
+                      <input id="photoUrl" type="file" (change)="onFileSelected($event)" accept="image/png, image/jpeg" class="hidden">
+                       @if (profileForm.controls.photoUrl.invalid && (profileForm.controls.photoUrl.dirty || profileForm.controls.photoUrl.touched)) {
+                        <p class="text-sm text-red-600 mt-2">Пожалуйста, загрузите фотографию.</p>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Step 2: Professional Experience -->
+          @if (currentStep() === 2) {
+            <div class="space-y-6 animate-fade-in">
+               <h2 class="text-xl font-semibold text-slate-700 dark:text-slate-200 border-b dark:border-slate-700 pb-2">Шаг 2: Профессиональный опыт</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label for="primarySpecialization" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Основная специализация</label>
+                  <input id="primarySpecialization" type="text" formControlName="primarySpecialization" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 dark:border-slate-600" placeholder="Например, Эксперт по семейному праву">
+                </div>
+                 <div>
+                  <label for="experienceYears" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Опыт (лет)</label>
+                  <input id="experienceYears" type="number" formControlName="experienceYears" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 dark:border-slate-600">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 mt-6">Категории права</label>
+                <div class="flex flex-wrap gap-2">
+                  @for(category of allCategories; track category) {
+                    <button type="button" (click)="toggleCategory(category)" class="px-3 py-1.5 text-sm rounded-full transition-colors"
+                      [class.bg-amber-500]="profileForm.controls.categories.value?.includes(category)"
+                      [class.text-white]="profileForm.controls.categories.value?.includes(category)"
+                      [class.bg-slate-200]="!profileForm.controls.categories.value?.includes(category)"
+                      [class.text-slate-700]="!profileForm.controls.categories.value?.includes(category)"
+                      [class.dark:bg-slate-700]="!profileForm.controls.categories.value?.includes(category)"
+                      [class.dark:text-slate-300]="!profileForm.controls.categories.value?.includes(category)"
+                      [class.dark:hover:bg-slate-600]="!profileForm.controls.categories.value?.includes(category)"
+                      [class.hover:bg-slate-300]="!profileForm.controls.categories.value?.includes(category)">
+                      {{ category }}
+                    </button>
+                  }
+                </div>
+                @if (profileForm.controls.categories.touched && profileForm.controls.categories.invalid) {
+                  <p class="text-sm text-red-600 mt-1">Пожалуйста, выберите хотя бы одну категорию.</p>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Step 3: Bio -->
+          @if (currentStep() === 3) {
+            <div class="space-y-6 animate-fade-in">
+              <h2 class="text-xl font-semibold text-slate-700 dark:text-slate-200 border-b dark:border-slate-700 pb-2">Шаг 3: О себе</h2>
+              <div>
+                <label for="bio" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Биография</label>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Расскажите о своем опыте, подходах к работе и чем вы можете быть полезны клиентам.</p>
+                <textarea id="bio" formControlName="bio" rows="6" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 dark:border-slate-600"></textarea>
+                 @if (profileForm.controls.bio.invalid && (profileForm.controls.bio.dirty || profileForm.controls.bio.touched)) {
+                  <p class="text-sm text-red-600 mt-1">Пожалуйста, заполните биографию.</p>
+                }
+              </div>
+               <div>
+                <label for="otherSpecializations" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Другие специализации (через запятую)</label>
+                 <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Укажите более узкие темы, в которых вы разбираетесь, например, "Раздел имущества" или "Споры с застройщиками".</p>
+                <input id="otherSpecializations" type="text" formControlName="otherSpecializations" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 dark:border-slate-600">
+               </div>
+            </div>
+          }
+
+          <!-- Step 4: Pricing -->
+           @if (currentStep() === 4) {
+            <div class="space-y-6 animate-fade-in">
+              <h2 class="text-xl font-semibold text-slate-700 dark:text-slate-200 border-b dark:border-slate-700 pb-2">Шаг 4: Стоимость услуг</h2>
+               <div>
+                  <label for="consultationPrice" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Стоимость платной консультации, ₽/час</label>
+                  <input id="consultationPrice" type="number" formControlName="consultationPrice" class="mt-1 block w-full md:w-1/2 rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 dark:border-slate-600">
+                   @if (profileForm.controls.consultationPrice.invalid && (profileForm.controls.consultationPrice.dirty || profileForm.controls.consultationPrice.touched)) {
+                    <p class="text-sm text-red-600 mt-1">Пожалуйста, укажите стоимость.</p>
+                  }
+                </div>
+                 <div class="space-y-3 p-4 bg-slate-100 dark:bg-slate-900/50 rounded-lg">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <h4 class="font-semibold text-slate-800 dark:text-white">Предлагать бесплатные консультации</h4>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Привлекайте больше клиентов, предлагая короткую бесплатную консультацию.</p>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" formControlName="offersFreeConsultation" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                      </label>
+                    </div>
+                    @if(profileForm.controls.offersFreeConsultation.value) {
+                       <div class="animate-fade-in">
+                          <label for="freeConsultationConditions" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Условия бесплатной консультации (необязательно)</label>
+                          <input id="freeConsultationConditions" type="text" formControlName="freeConsultationConditions" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 dark:border-slate-600" placeholder="Например: Только первичный анализ ситуации">
+                       </div>
+                    }
+                  </div>
+            </div>
+          }
+
+          <!-- Navigation -->
+          <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
+            @if (currentStep() > 1) {
+              <button type="button" (click)="prevStep()" class="px-6 py-2 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-white dark:border-slate-500">
+                Назад
+              </button>
+            } @else {
+              <!-- Placeholder to keep spacing -->
+              <div></div>
+            }
+
+            @if (currentStep() < 4) {
+              <button type="button" (click)="nextStep()" [disabled]="(currentStep() === 1 && !isStep1Valid()) || (currentStep() === 2 && !isStep2Valid()) || (currentStep() === 3 && !isStep3Valid())" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 disabled:bg-slate-400 disabled:cursor-not-allowed">
+                Далее
+              </button>
+            }
+            
+            @if (currentStep() === 4) {
+              <button type="submit" [disabled]="profileForm.invalid" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 disabled:cursor-not-allowed">
+                {{ (lawyer() && lawyer()!.fullName) ? 'Сохранить изменения' : 'Завершить регистрацию' }}
+              </button>
+            }
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

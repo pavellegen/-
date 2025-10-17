@@ -1,0 +1,392 @@
+<div class="bg-slate-100 dark:bg-slate-950 min-h-screen">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-8">
+      <button (click)="onBack()" class="flex items-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 mr-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+        Назад
+      </button>
+    </div>
+
+    @if (lawyer(); as l) {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+        <!-- Right Column -->
+        <div class="lg:col-span-1 lg:order-last space-y-6">
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+            <div class="flex flex-col items-center text-center">
+              <div class="relative mb-4">
+                <img class="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-slate-800 shadow-lg" [src]="l.photoUrl" [alt]="'Фото ' + l.fullName">
+                @if (l.offersFreeConsultation) {
+                  <div title="Бесплатная консультация" class="absolute top-0 left-0 z-10 p-1 [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.5))]">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-emerald-500 dark:text-emerald-400">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M10 5v14m-3-9h5m-5-4h6a4 4 0 0 1 0 8h-6M5 19L19 5" />
+                    </svg>
+                  </div>
+                }
+                @if (l.verificationStatus === 'approved') {
+                  <div title="Профиль проверен" class="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-full flex items-center border-4 border-white dark:border-slate-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                  </div>
+                }
+              </div>
+              <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-2">{{ l.fullName }}</h1>
+              <p class="text-amber-600 font-semibold text-sm">{{ l.primarySpecialization }}</p>
+              
+              @if (!isOwner()) {
+                 <button (click)="favoriteService.toggleFavorite(l.id)" [title]="isFavorite() ? 'Удалить из избранного' : 'Добавить в избранное'" class="mt-4 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 transition-colors" [class.text-amber-400]="isFavorite()" [class.text-slate-300]="!isFavorite()" [class.dark:text-slate-600]="!isFavorite()">
+                      <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.006Z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+              }
+            </div>
+
+            <div class="mt-6">
+              @if (isOwner()) {
+                <button (click)="onEdit()" class="w-full bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-bold py-3 px-4 rounded-lg transition-colors">
+                  Редактировать основную информацию
+                </button>
+              } @else {
+                <button (click)="openModal()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                  Запросить консультацию
+                </button>
+              }
+            </div>
+
+            <div class="mt-6 border-t border-slate-200 dark:border-slate-700 pt-6 grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p class="font-bold text-xl text-slate-700 dark:text-slate-200">{{ l.experienceYears }} лет</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Опыт</p>
+              </div>
+              <div>
+                <p class="font-bold text-xl text-slate-700 dark:text-slate-200">{{ l.consultationsHeld }}</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">{{ getConsultationNoun(l.consultationsHeld) }}</p>
+              </div>
+              <div>
+                <div class="font-bold text-xl text-slate-700 dark:text-slate-200 flex items-center justify-center">
+                   @if(l.reviews.length > 0) {
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-400 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8-2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                      {{ calculateAverageRating(l.reviews) }}
+                   } @else {
+                      {{ calculateAverageRating(l.reviews) }}
+                   }
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Рейтинг</p>
+              </div>
+            </div>
+             <ul class="mt-6 text-sm text-slate-600 dark:text-slate-300 space-y-3">
+                <li class="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                  {{l.city}}
+                </li>
+                 <li class="flex items-center">
+                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg>
+                   На сайте с {{ l.registrationDate | date:'dd.MM.yyyy' }}
+                </li>
+            </ul>
+          </div>
+           <!-- Specializations -->
+           <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+              <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">Специализации</h2>
+               <div class="flex flex-wrap gap-2">
+                 @for(spec of l.categories; track spec) {
+                    <span class="bg-amber-100 text-amber-800 text-sm font-medium px-3 py-1 rounded-full dark:bg-amber-900/50 dark:text-amber-300">{{ spec }}</span>
+                 }
+               </div>
+          </div>
+          <!-- Notification Settings -->
+          @if (isOwner()) {
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+               <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">Настройки уведомлений</h2>
+               <div class="flex justify-between items-center bg-slate-100 dark:bg-slate-900/50 p-4 rounded-lg">
+                 <div>
+                   <h3 class="font-semibold text-slate-800 dark:text-slate-200">СМС-уведомления</h3>
+                   <p class="text-sm text-slate-500 dark:text-slate-400">Получать СМС о новых запросах на консультацию.</p>
+                 </div>
+                 <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" [checked]="l.smsNotificationsEnabled" (change)="toggleSmsNotifications()" class="sr-only peer">
+                    <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                  </label>
+               </div>
+            </div>
+          }
+        </div>
+
+        <!-- Left Column -->
+        <div class="lg:col-span-2 space-y-8 relative z-10">
+            <!-- New Requests -->
+          @if (isOwner() && newConsultationRequests().length > 0) {
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg">
+              <div class="p-6 flex justify-between items-center border-b border-slate-200 dark:border-slate-700">
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Новые запросы</h2>
+                 <button (click)="toggleConsultationDetails()" class="text-sm font-semibold text-amber-600 hover:text-amber-800 transition-colors">
+                  {{ showConsultationDetails() ? 'Скрыть детали' : 'Показать детали' }}
+                </button>
+              </div>
+              <div class="divide-y divide-slate-100 dark:divide-slate-700">
+                @for(req of newConsultationRequests(); track req.id) {
+                  <div class="p-6">
+                    <div class="flex justify-between items-start gap-4">
+                      <div>
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">{{ req.clientName }}</h3>
+                         <p class="text-sm text-slate-500 dark:text-slate-400">{{ req.clientContact }}</p>
+                      </div>
+                      <div class="text-right flex-shrink-0">
+                        <div class="flex items-center gap-2">
+                           <span class="px-2 py-1 text-xs font-semibold rounded-full" [class.bg-emerald-100]="req.type === 'free'" [class.text-emerald-800]="req.type === 'free'" [class.dark:bg-emerald-900/50]="req.type === 'free'" [class.dark:text-emerald-300]="req.type === 'free'" [class.bg-blue-100]="req.type === 'paid'" [class.text-blue-800]="req.type === 'paid'" [class.dark:bg-blue-900/50]="req.type === 'paid'" [class.dark:text-blue-300]="req.type === 'paid'">
+                              {{ req.type === 'free' ? 'Бесплатная' : 'Платная' }}
+                           </span>
+                           <p class="font-semibold text-slate-800 dark:text-slate-100">{{ req.consultationDateTime | date:'dd.MM.yyyy в HH:mm' }}</p>
+                        </div>
+                        <p class="text-sm text-amber-600 dark:text-amber-500">{{ formatTimeUntilConsultation(req.consultationDateTime) }}</p>
+                      </div>
+                    </div>
+                    @if (showConsultationDetails() && req.description) {
+                       <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                         <p class="text-sm text-slate-600 dark:text-slate-300">{{ req.description }}</p>
+                       </div>
+                    }
+                    <div class="mt-4 flex justify-end gap-3">
+                      <button (click)="updateConsultationStatus(req.id, 'cancelled')" class="px-4 py-1.5 text-sm font-medium text-slate-700 bg-slate-200 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600 transition">Не состоялась</button>
+                      <button (click)="updateConsultationStatus(req.id, 'conducted')" class="px-4 py-1.5 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 transition">Проведена</button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+          <!-- Balance -->
+           @if (isOwner()) {
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+              <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Баланс и услуги</h2>
+              <div class="bg-slate-100 dark:bg-slate-900/50 p-4 rounded-lg flex justify-between items-center">
+                 <div>
+                   <p class="text-sm text-slate-600 dark:text-slate-400">Будет использоваться для платных услуг в будущем.</p>
+                   <p class="text-sm text-emerald-600 dark:text-emerald-400 font-semibold">Размещение профиля сейчас бесплатно!</p>
+                 </div>
+                 <p class="text-2xl font-bold text-slate-800 dark:text-white">{{ l.balance | number:'1.0-0' }} ₽</p>
+              </div>
+            </div>
+          }
+          <!-- Verification -->
+          @if (isOwner() && l.verificationStatus !== 'approved') {
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+              <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Верификация профиля</h2>
+              @if (isVerificationFormVisible()) {
+                <form [formGroup]="verificationForm" (ngSubmit)="submitVerification()">
+                  <div class="space-y-4">
+                    <div>
+                      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Фамилия (как в дипломе)</label>
+                      <input type="text" formControlName="lastName" placeholder="Иванов" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 dark:bg-slate-700 dark:text-white dark:border-slate-600">
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Серия бланка</label>
+                        <input type="text" formControlName="series" placeholder="АВ" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 dark:bg-slate-700 dark:text-white dark:border-slate-600">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Номер бланка</label>
+                        <input type="text" formControlName="number" placeholder="123456" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 dark:bg-slate-700 dark:text-white dark:border-slate-600">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Дата выдачи</label>
+                        <input type="date" formControlName="issueDate" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 dark:bg-slate-700 dark:text-white dark:border-slate-600">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" (click)="isVerificationFormVisible.set(false)" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 dark:bg-slate-600 dark:text-white dark:border-slate-500 dark:hover:bg-slate-500 transition">Отмена</button>
+                    <button type="submit" [disabled]="verificationForm.invalid" class="px-6 py-2 text-sm font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600 transition disabled:bg-slate-400">Отправить</button>
+                  </div>
+                </form>
+              } @else {
+                  @switch (l.verificationStatus) {
+                    @case ('none') {
+                      <div class="bg-slate-100 dark:bg-slate-900/50 p-4 rounded-lg flex justify-between items-center">
+                        <p class="text-slate-600 dark:text-slate-300">Пройдите верификацию, чтобы получить значок "Профиль проверен" и повысить доверие клиентов.</p>
+                        <button (click)="isVerificationFormVisible.set(true)" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-md transition-colors flex-shrink-0">Пройти верификацию</button>
+                      </div>
+                    }
+                    @case ('pending') {
+                       <div class="bg-blue-100 dark:bg-blue-900/50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-blue-800 dark:text-blue-200">Ваши данные на проверке</h3>
+                        <p class="text-sm text-blue-700 dark:text-blue-300">Мы проверяем предоставленную информацию. Обычно это занимает 1-2 рабочих дня.</p>
+                       </div>
+                    }
+                    @case ('rejected') {
+                      <div class="bg-red-100 dark:bg-red-900/50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-red-800 dark:text-red-200">Верификация отклонена</h3>
+                        <p class="text-sm text-red-700 dark:text-red-300 mb-2">Причина: {{ l.rejectionReason }}</p>
+                        <button (click)="isVerificationFormVisible.set(true)" class="text-sm font-semibold text-amber-600 hover:text-amber-800 transition-colors">Подать документы повторно</button>
+                       </div>
+                    }
+                  }
+              }
+            </div>
+          }
+          <!-- About Me -->
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4">Обо мне</h2>
+            <div class="prose prose-slate dark:prose-invert max-w-none" [innerHTML]="l.bio"></div>
+          </div>
+          <!-- Case Examples -->
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Примеры дел</h2>
+              @if (isOwner()) {
+                <button (click)="toggleCaseManagement()" class="text-sm font-semibold text-amber-600 hover:text-amber-800 transition-colors">{{ isManagingCases() ? 'Готово' : 'Управлять' }}</button>
+              }
+            </div>
+             @if (isOwner() && isManagingCases()) {
+                <form [formGroup]="caseForm" (ngSubmit)="saveCase()" class="p-4 bg-slate-100 dark:bg-slate-900/50 rounded-lg mb-6 space-y-4 animate-fade-in">
+                  <h3 class="font-semibold text-lg dark:text-white">{{ editingCaseIndex() !== null ? 'Редактировать дело' : 'Добавить новое дело' }}</h3>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Заголовок</label>
+                    <input type="text" formControlName="title" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 dark:bg-slate-700 dark:text-white dark:border-slate-600">
+                  </div>
+                   <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Описание</label>
+                    <textarea formControlName="description" rows="3" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 dark:bg-slate-700 dark:text-white dark:border-slate-600"></textarea>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Ссылка на источник (необязательно)</label>
+                    <input type="url" formControlName="sourceUrl" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 dark:bg-slate-700 dark:text-white dark:border-slate-600" placeholder="https://kad.arbitr.ru/...">
+                  </div>
+                  <div class="flex justify-end gap-3">
+                    @if (editingCaseIndex() !== null) {
+                      <button type="button" (click)="cancelEdit()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 dark:bg-slate-600 dark:text-white dark:border-slate-500 dark:hover:bg-slate-500 transition">Отмена</button>
+                    }
+                    <button type="submit" [disabled]="caseForm.invalid" class="px-6 py-2 text-sm font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600 transition disabled:bg-slate-400">Сохранить</button>
+                  </div>
+                </form>
+             }
+            @if (l.caseExamples.length > 0) {
+              <div>
+                @for(caseEx of paginatedCaseExamples(); track $index) {
+                  <div class="border-b border-slate-100 dark:border-slate-700 pb-6 last:border-b-0 last:pb-0">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">{{ caseEx.title }}</h3>
+                        @if(isOwner() && isManagingCases()) {
+                           <div class="flex items-center gap-2 flex-shrink-0 ml-4">
+                            <button (click)="startEditCase(currentCaseExamplesPage() - 1, caseEx)" class="p-1.5 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg></button>
+                            <button (click)="deleteCase(currentCaseExamplesPage() - 1)" class="p-1.5 text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg></button>
+                          </div>
+                        }
+                    </div>
+                    <p class="mt-2 text-slate-600 dark:text-slate-300">{{ caseEx.description }}</p>
+                     @if(caseEx.sourceUrl) {
+                        <a [href]="caseEx.sourceUrl" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-amber-600 hover:text-amber-800 transition-colors inline-flex items-center mt-2">
+                          Источник
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" /><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" /></svg>
+                        </a>
+                     }
+                  </div>
+                }
+              </div>
+
+              @if (totalCaseExamplesPages() > 1) {
+                <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                  <button (click)="prevCasePage()" [disabled]="currentCaseExamplesPage() === 1" class="px-4 py-2 text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600">
+                    Предыдущее дело
+                  </button>
+                  <span class="text-sm font-semibold text-slate-700 dark:text-slate-200 px-2">
+                    Дело {{ currentCaseExamplesPage() }} из {{ totalCaseExamplesPages() }}
+                  </span>
+                  <button (click)="nextCasePage()" [disabled]="currentCaseExamplesPage() === totalCaseExamplesPages()" class="px-4 py-2 text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600">
+                    Следующее дело
+                  </button>
+                </div>
+              }
+            } @else {
+              <p class="text-slate-500 dark:text-slate-400">Юрист еще не добавил примеры успешно завершенных дел.</p>
+            }
+          </div>
+          <!-- Reviews -->
+          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Отзывы клиентов ({{ l.reviews.length }})</h2>
+                 @if (!isOwner()) {
+                  <button (click)="openReviewModal()" class="text-sm font-semibold text-amber-600 hover:text-amber-800 transition-colors">Оставить отзыв</button>
+                }
+            </div>
+             @if (l.reviews.length > 0) {
+              <div class="space-y-6">
+                 @for(review of l.reviews; track review.author) {
+                  <div class="border-b border-slate-100 dark:border-slate-700 pb-6 last:border-b-0 last:pb-0">
+                    <div class="flex items-center mb-2">
+                       <div class="flex items-center">
+                        @for (i of [1,2,3,4,5]; track i) {
+                           <svg class="w-5 h-5" [class.text-amber-400]="i <= review.rating" [class.text-slate-300]="i > review.rating" [class.dark:text-slate-600]="i > review.rating" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8-2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                           </svg>
+                        }
+                       </div>
+                       <h3 class="ml-4 text-md font-semibold text-slate-800 dark:text-slate-100">{{ review.author }}</h3>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-300">{{ review.text }}</p>
+                  </div>
+                 }
+              </div>
+            } @else {
+              @if (isOwner()) {
+                <p class="text-slate-500 dark:text-slate-400">У вас пока нет отзывов.</p>
+              } @else {
+                <p class="text-slate-500 dark:text-slate-400">Отзывов пока нет. Станьте первым, кто оставит отзыв этому юристу!</p>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="text-center py-20">
+         <p class="text-slate-500 dark:text-slate-400">Загрузка профиля...</p>
+      </div>
+    }
+
+    @if (isModalOpen()) {
+      <app-consultation-modal 
+        [lawyerId]="lawyer()!.id" 
+        [lawyerName]="lawyer()!.fullName"
+        [consultationPrice]="lawyer()!.consultationPrice"
+        [offersFreeConsultation]="lawyer()!.offersFreeConsultation"
+        [freeConsultationConditions]="lawyer()!.freeConsultationConditions"
+        (close)="closeModal()">
+      </app-consultation-modal>
+    }
+
+    @if (isReviewModalOpen()) {
+      <app-review-modal
+        [lawyerId]="lawyer()!.id"
+        [lawyerName]="lawyer()!.fullName"
+        (close)="closeReviewModal()">
+      </app-review-modal>
+    }
+
+    @if (isConfirmDeleteModalOpen()) {
+      <div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-6 text-center">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Подтвердите удаление</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">Вы уверены, что хотите удалить этот пример дела? Это действие нельзя будет отменить.</p>
+            <div class="mt-6 flex justify-center gap-3">
+              <button (click)="cancelDelete()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 dark:bg-slate-600 dark:text-white dark:border-slate-500 dark:hover:bg-slate-500 transition">Отмена</button>
+              <button (click)="confirmDelete()" class="px-6 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition">Удалить</button>
+            </div>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
+<style>
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

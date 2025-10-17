@@ -1,0 +1,140 @@
+<div class="bg-slate-800">
+  <div class="relative isolate px-6 pt-14 lg:px-8">
+    <img src="https://fastly.picsum.photos/id/48/5000/3333.jpg?hmac=y3_1VDNbhii0vM_FN6wxMlvK27vFefflbUSH06z98so" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover opacity-20">
+    <header class="absolute inset-x-0 top-0 z-50">
+      <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
+        <div>
+          <a href="#" class="-m-1.5 p-1.5">
+            <span class="text-white font-bold text-xl">ЮрЧек</span>
+          </a>
+        </div>
+        @if (loggedInLawyer()) {
+          @if(isRegistrationInProgress()) {
+            <button (click)="continueRegistration.emit()" class="text-base font-semibold leading-6 text-white bg-amber-500/80 px-5 py-2.5 rounded-lg hover:bg-amber-500 transition-colors">
+              Продолжить заполнение профиля
+            </button>
+          } @else {
+            <div class="relative">
+              <button (click)="goToProfile.emit()" class="text-base font-semibold leading-6 text-white bg-white/10 px-5 py-2.5 rounded-lg hover:bg-white/20 transition-colors">В профиль</button>
+              @if(newRequestCount() > 0) {
+                 <span class="absolute -bottom-2 -left-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-md">
+                   {{ newRequestCount() }}
+                 </span>
+              }
+            </div>
+          }
+        } @else {
+          <button (click)="isLoginModalOpen.set(true)" class="text-base font-semibold leading-6 text-white bg-white/10 px-5 py-2.5 rounded-lg hover:bg-white/20 transition-colors">Для юристов</button>
+        }
+      </nav>
+    </header>
+    <div class="mx-auto max-w-3xl py-32 sm:py-48 lg:py-56 text-center">
+      <h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl">Ваш идеальный юрист в пару кликов</h1>
+      <p class="mt-6 text-lg leading-8 text-slate-300">Хватит искать, начните выбирать. Проверенные специалисты для вашего дела.</p>
+    </div>
+  </div>
+</div>
+
+<main class="container mx-auto px-6 py-16">
+  <!-- Category Selection -->
+  <section id="problem-selection" class="text-center">
+    <h2 class="text-3xl font-bold mb-2 dark:text-white">В чем ваша проблема?</h2>
+    <p class="text-slate-600 dark:text-slate-400 mb-10">Выберите категорию, чтобы мы подобрали для вас лучших специалистов.</p>
+    
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+      @for (category of categories; track category.name) {
+        <button (click)="onSelectCategory(category.name)" class="group w-full bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-200 dark:border-slate-700 h-full flex flex-col justify-center min-h-48">
+          <div class="bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8" [innerHTML]="sanitizer.bypassSecurityTrustHtml(category.icon)"></svg>
+          </div>
+          <h3 class="text-lg font-semibold dark:text-slate-100 flex items-center justify-center text-center h-16">{{ category.name }}</h3>
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how-it-works" class="py-24">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold dark:text-white">Как это работает</h2>
+      <p class="text-slate-600 dark:text-slate-400 mt-2">Всего 3 простых шага до решения вашей проблемы.</p>
+    </div>
+    <div class="relative">
+       <div aria-hidden="true" class="hidden md:block absolute top-10 left-0 w-full">
+         <div class="w-2/3 h-px mx-auto border-t-2 border-dashed border-slate-300 dark:border-slate-700"></div>
+       </div>
+       <div class="grid md:grid-cols-3 gap-10 text-center">
+         <div class="flex flex-col items-center">
+           <div class="relative bg-slate-50 dark:bg-slate-900 p-1">
+             <div class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full w-20 h-20 flex items-center justify-center mb-4">
+               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+             </div>
+           </div>
+           <h3 class="text-xl font-semibold mb-2 mt-4 dark:text-white">Нажмите по категории</h3>
+           <p class="text-slate-600 dark:text-slate-400">Нажмите на раздел, который соответствует вашей проблеме, чтобы увидеть список юристов.</p>
+         </div>
+         <div class="flex flex-col items-center">
+           <div class="relative bg-slate-50 dark:bg-slate-900 p-1">
+             <div class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full w-20 h-20 flex items-center justify-center mb-4">
+               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+             </div>
+           </div>
+           <h3 class="text-xl font-semibold mb-2 mt-4 dark:text-white">Выберите эксперта</h3>
+           <p class="text-slate-600 dark:text-slate-400">Просматривайте профили, изучайте опыт и отзывы, чтобы сделать правильный выбор.</p>
+         </div>
+         <div class="flex flex-col items-center">
+           <div class="relative bg-slate-50 dark:bg-slate-900 p-1">
+             <div class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full w-20 h-20 flex items-center justify-center mb-4">
+               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+             </div>
+           </div>
+           <h3 class="text-xl font-semibold mb-2 mt-4 dark:text-white">Получите консультацию</h3>
+           <p class="text-slate-600 dark:text-slate-400">Запишитесь на бесплатную первичную консультацию в один клик.</p>
+         </div>
+       </div>
+    </div>
+  </section>
+
+  <!-- Why Yur4ek -->
+  <section id="why-us" class="bg-white dark:bg-slate-800 rounded-2xl p-10 md:p-16 border border-slate-200 dark:border-slate-700">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <h2 class="text-3xl font-bold mb-4 dark:text-white">Почему ЮрЧек?</h2>
+        <p class="text-slate-600 dark:text-slate-400 mb-8">Мы создали платформу, которой доверяют, потому что ценим ваше время и спокойствие.</p>
+        <ul class="space-y-6">
+          <li class="flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500 mr-4 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div>
+              <h4 class="font-semibold text-lg dark:text-white">Проверенные профили</h4>
+              <p class="text-slate-600 dark:text-slate-400">Каждый юрист на нашей платформе проходит ручную проверку документов и квалификации.</p>
+            </div>
+          </li>
+          <li class="flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500 mr-4 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.364 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.98 9.82c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+            <div>
+              <h4 class="font-semibold text-lg dark:text-white">Прозрачные рейтинги</h4>
+              <p class="text-slate-600 dark:text-slate-400">Система отзывов основана на оценках реальных клиентов после консультаций.</p>
+            </div>
+          </li>
+          <li class="flex items-start">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500 mr-4 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            <div>
+              <h4 class="font-semibold text-lg dark:text-white">Быстро и просто</h4>
+              <p class="text-slate-600 dark:text-slate-400">Найдите подходящего специалиста за несколько минут, а не тратьте недели на поиски.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="hidden md:block">
+        <img src="https://fastly.picsum.photos/id/1077/3000/1995.jpg?hmac=gx_KF_cdQtv7ilOSaN8YEsNKkhcwRQ507UB7qZ4RutI" alt="Lawyer discussing with client" class="rounded-xl shadow-lg">
+      </div>
+    </div>
+  </section>
+</main>
+@if(isLoginModalOpen()) {
+  <app-lawyer-login-modal 
+    (close)="isLoginModalOpen.set(false)" 
+    (registered)="handleRegistration($event)"
+    (loginSuccess)="loginRequest.emit($event)">
+  </app-lawyer-login-modal>
+}

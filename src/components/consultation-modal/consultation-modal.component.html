@@ -1,0 +1,195 @@
+<div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 animate-fade-in" (click)="onClose()">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg mx-auto animate-slide-up" (click)="$event.stopPropagation()">
+    
+    @switch (formState()) {
+      @case ('editing') {
+        <div>
+          <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+            <h2 class="text-2xl font-bold dark:text-white">Запрос на консультацию</h2>
+            <p class="text-slate-500 dark:text-slate-400 mt-1">с юристом {{ lawyerName() }}</p>
+          </div>
+          <form (submit)="$event.preventDefault(); getVerificationCode()">
+            <div class="p-6 space-y-4">
+               <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Тип консультации</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <label class="flex p-3 border rounded-md transition-colors"
+                         [class.cursor-pointer]="offersFreeConsultation()"
+                         [class.cursor-not-allowed]="!offersFreeConsultation()"
+                         [class.opacity-50]="!offersFreeConsultation()"
+                         [class.border-amber-500]="consultationType() === 'free'" 
+                         [class.bg-amber-50]="consultationType() === 'free'" 
+                         [class.dark:bg-amber-900/50]="consultationType() === 'free'" 
+                         [class.border-slate-300]="consultationType() !== 'free'" 
+                         [class.dark:border-slate-600]="consultationType() !== 'free'">
+                    <input type="radio" name="consultation-type" class="hidden" value="free" (change)="consultationType.set('free')" [checked]="consultationType() === 'free'" [disabled]="!offersFreeConsultation()">
+                    <div class="ml-2">
+                      <p class="font-semibold text-slate-800 dark:text-slate-100">Бесплатная</p>
+                       @if (offersFreeConsultation() && freeConsultationConditions()) {
+                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">{{ freeConsultationConditions() }}</p>
+                       }
+                    </div>
+                  </label>
+                  <label class="flex items-center p-3 border rounded-md cursor-pointer transition-colors" [class.border-amber-500]="consultationType() === 'paid'" [class.bg-amber-50]="consultationType() === 'paid'" [class.dark:bg-amber-900/50]="consultationType() === 'paid'" [class.border-slate-300]="consultationType() !== 'paid'" [class.dark:border-slate-600]="consultationType() !== 'paid'">
+                    <input type="radio" name="consultation-type" class="hidden" value="paid" (change)="consultationType.set('paid')" [checked]="consultationType() === 'paid'">
+                     <div class="ml-2">
+                      <p class="font-semibold text-slate-800 dark:text-slate-100">Платная</p>
+                      <p class="text-xs text-slate-500 dark:text-slate-400">{{ consultationPrice() }}₽ / час</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              <div>
+                <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Ваше имя</label>
+                <input type="text" id="name" required class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
+                 [value]="clientName()" (input)="clientName.set($any($event.target).value)">
+              </div>
+              <div>
+                <label for="contact" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Ваш номер телефона</label>
+                <input type="tel" id="contact" required placeholder="+7 (999) 123-45-67" class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
+                 [value]="clientContact()" (input)="onPhoneInput($event)">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Желаемые дата и время</label>
+                 <div class="grid grid-cols-2 gap-4 mt-1">
+                  <div>
+                     <input type="date" id="date" required class="block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
+                      [value]="consultationDate()" (input)="consultationDate.set($any($event.target).value)" [min]="minDate()">
+                  </div>
+                  <div>
+                    <input type="time" id="time" required class="block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
+                      [value]="consultationTime()" (input)="consultationTime.set($any($event.target).value)" [min]="minTime()">
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label for="situation" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Кратко опишите вашу ситуацию (необязательно)</label>
+                <textarea id="situation" rows="3" class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
+                 [value]="situation()" (input)="situation.set($any($event.target).value)"></textarea>
+              </div>
+              @if(error(); as err) {
+                <p class="text-sm text-red-600 text-center">{{ err }}</p>
+              }
+            </div>
+            <div class="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-b-2xl flex justify-end items-center gap-3">
+              <button type="button" (click)="onClose()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 dark:bg-slate-600 dark:text-white dark:border-slate-500 dark:hover:bg-slate-500 transition">Отмена</button>
+              <button type="submit" [disabled]="!isFormValid()" class="px-6 py-2 text-sm font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600 transition disabled:bg-slate-400 disabled:cursor-not-allowed">Получить код</button>
+            </div>
+          </form>
+        </div>
+      }
+      @case ('verifying') {
+        <form (submit)="$event.preventDefault(); onVerify()">
+          <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+            <h2 class="text-2xl font-bold dark:text-white">Подтверждение номера</h2>
+            <p class="text-slate-500 dark:text-slate-400 mt-1">Мы (как будто) отправили код на номер <span class="font-semibold text-slate-700 dark:text-slate-200">{{ clientContact() }}</span>. <button type="button" (click)="changePhoneNumber()" class="text-amber-600 hover:underline text-sm">Изменить</button></p>
+          </div>
+          <div class="p-6 space-y-4">
+            <div>
+              <label for="code" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Код из СМС</label>
+              <input 
+                type="text" 
+                id="code" 
+                required 
+                maxlength="4" 
+                inputmode="numeric"
+                pattern="\d{4}"
+                placeholder="0000"
+                [value]="verificationCode()"
+                (input)="verificationCode.set($event.target.value)"
+                class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm text-slate-900 dark:text-white text-center tracking-[1em]">
+               <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 text-center">Для теста подойдет любой 4-значный код.</p>
+            </div>
+            @if(error(); as err) {
+              <p class="text-sm text-red-600 text-center">{{ err }}</p>
+            }
+          </div>
+          <div class="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-b-2xl flex justify-end items-center gap-3">
+            <button type="button" (click)="onClose()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 dark:bg-slate-600 dark:text-white dark:border-slate-500 dark:hover:bg-slate-500 transition">Отмена</button>
+            <button type="submit" class="px-6 py-2 text-sm font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600 transition">Подтвердить и отправить</button>
+          </div>
+        </form>
+      }
+      @case ('paying') {
+        <div>
+           <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+            <h2 class="text-2xl font-bold dark:text-white">Оплата консультации</h2>
+            <p class="text-slate-500 dark:text-slate-400 mt-1">Сумма к оплате: {{ consultationPrice() }}₽</p>
+          </div>
+          <form (submit)="$event.preventDefault(); handlePayment()">
+             <div class="p-6 space-y-4">
+                <div>
+                  <label for="card-number" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Номер карты</label>
+                  <input type="text" id="card-number" placeholder="0000 0000 0000 0000" required class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label for="expiry-date" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Срок действия</label>
+                      <input type="text" id="expiry-date" placeholder="ММ / ГГ" required class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm">
+                    </div>
+                    <div>
+                      <label for="cvc" class="block text-sm font-medium text-slate-700 dark:text-slate-300">CVC / CVV</label>
+                      <input type="text" id="cvc" placeholder="123" required class="mt-1 block w-full px-3 py-2 bg-white dark:bg-slate-700 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm">
+                    </div>
+                </div>
+             </div>
+              <div class="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-b-2xl flex justify-end items-center gap-3">
+                <button type="button" (click)="formState.set('verifying')" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 dark:bg-slate-600 dark:text-white dark:border-slate-500 dark:hover:bg-slate-500 transition">Назад</button>
+                <button type="submit" class="px-6 py-2 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600 transition flex items-center">
+                  Оплатить {{ consultationPrice() }}₽
+                </button>
+              </div>
+          </form>
+        </div>
+      }
+      @case ('submitted') {
+        <div class="p-8 text-center">
+          <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/50 mb-4">
+            <svg class="h-8 w-8 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Запрос отправлен!</h3>
+          <div class="mt-2">
+            <p class="text-sm text-slate-600 dark:text-slate-400">Ваш запрос на {{ consultationType() === 'paid' ? 'платную' : 'бесплатную' }} консультацию отправлен юристу {{ lawyerName() }}. Он свяжется с вами для подтверждения времени.</p>
+          </div>
+          <div class="mt-6">
+            <button type="button" (click)="onClose()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-md">Закрыть</button>
+          </div>
+        </div>
+      }
+      @case ('processing') {
+        <div class="p-8 text-center flex flex-col items-center justify-center h-64">
+           <svg class="animate-spin h-10 w-10 text-amber-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mt-4">Обработка платежа...</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Пожалуйста, подождите.</p>
+        </div>
+      }
+       @case ('error') {
+        <div class="p-8 text-center">
+          <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50 mb-4">
+            <svg class="h-8 w-8 text-red-600 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Произошла ошибка</h3>
+          <div class="mt-2">
+            <p class="text-sm text-slate-600 dark:text-slate-400">{{ error() }}</p>
+          </div>
+          <div class="mt-6">
+            <button type="button" (click)="onClose()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-md">Закрыть</button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
+<style>
+  .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+  .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
