@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, output, signal, inject } from '@angular/core';
-import { LawyerService } from '../../services/lawyer.service';
-import { Lawyer } from '../../models/lawyer.model';
-import { formatPhoneNumber, normalizePhoneNumber } from '../../utils/phone-formatter';
+import { LawyerService } from '../../services/lawyer.service.ts';
+import { Lawyer } from '../../models/lawyer.model.ts';
+import { formatPhoneNumber, normalizePhoneNumber } from '../../utils/phone-formatter.ts';
 
 @Component({
   selector: 'app-lawyer-login-modal',

@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, inject } from '@angular/core';
-import { Lawyer, Review } from '../../models/lawyer.model';
-import { FavoriteLawyerService } from '../../services/favorite.service';
+import { Lawyer, Review } from '../../models/lawyer.model.ts';
+import { FavoriteLawyerService } from '../../services/favorite.service.ts';
 
 @Component({
   selector: 'app-lawyer-card',

@@ -1,8 +1,8 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, inject, signal, effect } from '@angular/core';
-import { Lawyer } from '../../models/lawyer.model';
-import { LawyerService } from '../../services/lawyer.service';
-import { FavoriteLawyerService } from '../../services/favorite.service';
-import { LawyerCardComponent } from '../lawyer-card/lawyer-card.component';
+import { Lawyer } from '../../models/lawyer.model.ts';
+import { LawyerService } from '../../services/lawyer.service.ts';
+import { FavoriteLawyerService } from '../../services/favorite.service.ts';
+import { LawyerCardComponent } from '../lawyer-card/lawyer-card.component.ts';
 
 // A helper type for our pre-computed search data
 type SearchableLawyer = Lawyer & { searchableText: string };

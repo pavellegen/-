@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, output, signal, input, effect, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Lawyer } from '../../models/lawyer.model';
-import { formatPhoneNumber, normalizePhoneNumber } from '../../utils/phone-formatter';
+import { Lawyer } from '../../models/lawyer.model.ts';
+import { formatPhoneNumber, normalizePhoneNumber } from '../../utils/phone-formatter.ts';
 import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 

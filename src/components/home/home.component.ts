@@ -1,8 +1,8 @@
 import { Component, ChangeDetectionStrategy, output, signal, inject, input, computed } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { LawyerLoginModalComponent } from '../lawyer-login-modal/lawyer-login-modal.component';
-import { Lawyer } from '../../models/lawyer.model';
-import { ConsultationService } from '../../services/consultation.service';
+import { LawyerLoginModalComponent } from '../lawyer-login-modal/lawyer-login-modal.component.ts';
+import { Lawyer } from '../../models/lawyer.model.ts';
+import { ConsultationService } from '../../services/consultation.service.ts';
 
 interface Category {
   name: string;

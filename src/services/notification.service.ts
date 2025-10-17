@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { LawyerService } from './lawyer.service';
+import { LawyerService } from './lawyer.service.ts';
 
 @Injectable({
   providedIn: 'root'

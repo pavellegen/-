@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LawyerService } from '../../services/lawyer.service';
-import { Lawyer } from '../../models/lawyer.model';
+import { LawyerService } from '../../services/lawyer.service.ts';
+import { Lawyer } from '../../models/lawyer.model.ts';
 
 @Component({
   selector: 'app-admin-panel',

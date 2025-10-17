@@ -1,12 +1,12 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, inject, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Lawyer, Review, CaseExample, VerificationInfo } from '../../models/lawyer.model';
-import { ConsultationModalComponent } from '../consultation-modal/consultation-modal.component';
-import { LawyerService } from '../../services/lawyer.service';
+import { Lawyer, Review, CaseExample, VerificationInfo } from '../../models/lawyer.model.ts';
+import { ConsultationModalComponent } from '../consultation-modal/consultation-modal.component.ts';
+import { LawyerService } from '../../services/lawyer.service.ts';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ConsultationService } from '../../services/consultation.service';
-import { FavoriteLawyerService } from '../../services/favorite.service';
-import { ReviewModalComponent } from '../review-modal/review-modal.component';
+import { ConsultationService } from '../../services/consultation.service.ts';
+import { FavoriteLawyerService } from '../../services/favorite.service.ts';
+import { ReviewModalComponent } from '../review-modal/review-modal.component.ts';
 
 @Component({
   selector: 'app-lawyer-profile',

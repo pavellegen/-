@@ -1,6 +1,6 @@
 import { Injectable, signal, effect } from '@angular/core';
-import { Lawyer, VerificationInfo, CaseExample, Review } from '../models/lawyer.model';
-import { normalizePhoneNumber } from '../utils/phone-formatter';
+import { Lawyer, VerificationInfo, CaseExample, Review } from '../models/lawyer.model.ts';
+import { normalizePhoneNumber } from '../utils/phone-formatter.ts';
 
 const LAWYERS_DATA: Lawyer[] = [
   // Семейное право

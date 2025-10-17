@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ConsultationService } from '../../services/consultation.service';
-import { LawyerService } from '../../services/lawyer.service';
-import { formatPhoneNumber } from '../../utils/phone-formatter';
-import { ConsultationRequest } from '../../models/consultation.model';
-import { Review } from '../../models/lawyer.model';
+import { ConsultationService } from '../../services/consultation.service.ts';
+import { LawyerService } from '../../services/lawyer.service.ts';
+import { formatPhoneNumber } from '../../utils/phone-formatter.ts';
+import { ConsultationRequest } from '../../models/consultation.model.ts';
+import { Review } from '../../models/lawyer.model.ts';
 
 type FormState = 'enterPhone' | 'leaveReview' | 'submitted' | 'error';
 

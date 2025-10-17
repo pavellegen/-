@@ -1,16 +1,16 @@
 import { Component, ChangeDetectionStrategy, signal, inject, afterNextRender, effect, Injector, runInInjectionContext } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
-import { HomeComponent } from './components/home/home.component';
-import { LawyerListComponent } from './components/lawyer-list/lawyer-list.component';
-import { LawyerProfileComponent } from './components/lawyer-profile/lawyer-profile.component';
-import { LawyerProfileEditorComponent } from './components/lawyer-profile-editor/lawyer-profile-editor.component';
-import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
-import { ReviewModalComponent } from './components/review-modal/review-modal.component';
-import { Lawyer } from './models/lawyer.model';
-import { LawyerService } from './services/lawyer.service';
-import { NotificationService } from './services/notification.service';
-import { ThemeService } from './services/theme.service';
-import { ConsultationService } from './services/consultation.service';
+import { HomeComponent } from './components/home/home.component.ts';
+import { LawyerListComponent } from './components/lawyer-list/lawyer-list.component.ts';
+import { LawyerProfileComponent } from './components/lawyer-profile/lawyer-profile.component.ts';
+import { LawyerProfileEditorComponent } from './components/lawyer-profile-editor/lawyer-profile-editor.component.ts';
+import { AdminPanelComponent } from './components/admin-panel/admin-panel.component.ts';
+import { ReviewModalComponent } from './components/review-modal/review-modal.component.ts';
+import { Lawyer } from './models/lawyer.model.ts';
+import { LawyerService } from './services/lawyer.service.ts';
+import { NotificationService } from './services/notification.service.ts';
+import { ThemeService } from './services/theme.service.ts';
+import { ConsultationService } from './services/consultation.service.ts';
 
 type View = 'home' | 'list' | 'profile' | 'profileEditor' | 'admin';
 

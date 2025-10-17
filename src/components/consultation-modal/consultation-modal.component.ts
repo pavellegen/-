@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, output, signal, inject, computed, effect } from '@angular/core';
-import { ConsultationService } from '../../services/consultation.service';
-import { formatPhoneNumber, normalizePhoneNumber } from '../../utils/phone-formatter';
+import { ConsultationService } from '../../services/consultation.service.ts';
+import { formatPhoneNumber, normalizePhoneNumber } from '../../utils/phone-formatter.ts';
 
 type FormState = 'editing' | 'verifying' | 'paying' | 'processing' | 'submitted' | 'error';
 

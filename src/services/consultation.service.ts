@@ -1,7 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { ConsultationRequest } from '../models/consultation.model';
-import { LawyerService } from './lawyer.service';
-import { normalizePhoneNumber } from '../utils/phone-formatter';
+import { ConsultationRequest } from '../models/consultation.model.ts';
+import { LawyerService } from './lawyer.service.ts';
+import { normalizePhoneNumber } from '../utils/phone-formatter.ts';
 
 @Injectable({
   providedIn: 'root'
